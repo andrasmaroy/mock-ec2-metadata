@@ -158,6 +158,10 @@ func (s *MetadataService) GetSecurityCredentialDetails(w http.ResponseWriter, r 
 		s.config.MetadataValues.SecurityCredentials)
 }
 
+func (s *MetadataService) GetMetadata(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, `meta-data`)
+}
+
 func (s *MetadataService) GetMetadataIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `hostname
 instance-id
@@ -173,70 +177,81 @@ func (s *MetadataService) GetUserData(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *MetadataService) GetIndex(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Mock EC2 Metadata Service")
+	var metadataVersions []string
+	for _, metadataPrefix := range s.config.MetadataPrefixes{
+		metadataVersions = append(metadataVersions, strings.Split(metadataPrefix, "/")[1])
+	}
+
+	fmt.Fprintf(w, strings.Join(metadataVersions, "\n"))
 }
 
 // Endpoints is a listing of all endpoints available in the MetadataService.
 func (service *MetadataService) Endpoints() map[string]map[string]http.HandlerFunc {
 	handlers := map[string]map[string]http.HandlerFunc{}
 
-	for index, value := range service.config.MetadataPrefixes {
-		server.Log.Info("adding Metadata prefix (", index, ") ", value)
-		handlers[value+"/"] = map[string]http.HandlerFunc{
+	for index, metadataPrefix := range service.config.MetadataPrefixes {
+		server.Log.Info("adding Metadata prefix (", index, ") ", metadataPrefix)
+
+		var metadataVersion = strings.Split(metadataPrefix, "/")[1]
+		server.Log.Info("adding metadata version (", metadataVersion, ") ")
+		handlers["/" + metadataVersion + "/"] = map[string]http.HandlerFunc{
+			"GET": plainText(service.GetMetadata),
+		}
+		handlers[metadataPrefix+"/"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetMetadataIndex),
 		}
-		handlers[value+"/ami-id"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/ami-id"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetAmiId),
 		}
-		handlers[value+"/ami-launch-index"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/ami-launch-index"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetAmiLaunchIndex),
 		}
-		handlers[value+"/ami-manifest-path"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/ami-manifest-path"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetAmiManifestPath),
 		}
-		handlers[value+"/placement/availability-zone"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/placement/availability-zone"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetAvailabilityZone),
 		}
-		handlers[value+"/hostname"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/hostname"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetHostName),
 		}
-		handlers[value+"/instance-action"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/instance-action"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetInstanceAction),
 		}
-		handlers[value+"/instance-id"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/instance-id"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetInstanceId),
 		}
-		handlers[value+"/instance-type"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/instance-type"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetInstanceType),
 		}
-		handlers[value+"/iam/"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/iam/"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetIAM),
 		}
-		handlers[value+"/iam/security-credentials"] = map[string]http.HandlerFunc{
-			"GET": movedPermanently(value + "/iam/security-credentials/"),
+		handlers[metadataPrefix+"/iam/security-credentials"] = map[string]http.HandlerFunc{
+			"GET": movedPermanently(metadataPrefix + "/iam/security-credentials/"),
 		}
-		handlers[value+"/iam/security-credentials/"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/iam/security-credentials/"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetSecurityCredentials),
 		}
-		handlers[value+"/iam/security-credentials/{username}"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/iam/security-credentials/{username}"] = map[string]http.HandlerFunc{
 			"GET": service.GetSecurityCredentialDetails,
 		}
-		handlers[value+"/local-hostname"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/local-hostname"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetLocalHostName),
 		}
-		handlers[value+"/local-ipv4"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/local-ipv4"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetLocalIpv4),
 		}
-		handlers[value+"/mac"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/mac"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetMac),
 		}
-		handlers[value+"/profile"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/profile"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetProfile),
 		}
-		handlers[value+"/reservation-id"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/reservation-id"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetReservationId),
 		}
-		handlers[value+"/security-groups"] = map[string]http.HandlerFunc{
+		handlers[metadataPrefix+"/security-groups"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetSecurityGroups),
 		}
 	}

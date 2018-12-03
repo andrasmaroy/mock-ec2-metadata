@@ -163,10 +163,11 @@ func (s *MetadataService) GetMetadata(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *MetadataService) GetMetadataIndex(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `hostname
-instance-id
-instance-type
-iam`)
+	var availableItems = []string{"ami-id", "ami-launch-index", "ami-manifest-path",
+		"hostname", "iam/", "instance-action", "instance-id", "instance-type", "local-hostname",
+		"local-ipv4", "mac", "placement/", "profile", "reservation-id", "security-groups"}
+
+	fmt.Fprintf(w, strings.Join(availableItems, "\n"))
 }
 
 func (s *MetadataService) GetUserData(w http.ResponseWriter, r *http.Request) {
@@ -193,7 +194,7 @@ func (service *MetadataService) Endpoints() map[string]map[string]http.HandlerFu
 		server.Log.Info("adding Metadata prefix (", index, ") ", metadataPrefix)
 
 		var metadataVersion = strings.Split(metadataPrefix, "/")[1]
-		server.Log.Info("adding metadata version (", metadataVersion, ") ")
+		server.Log.Info("adding metadata version: ", metadataVersion)
 		handlers["/" + metadataVersion + "/"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetMetadata),
 		}

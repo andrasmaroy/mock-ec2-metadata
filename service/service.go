@@ -137,6 +137,10 @@ func (s *MetadataService) GetSecurityGroups(w http.ResponseWriter, r *http.Reque
 	fmt.Fprintf(w, strings.Join(s.config.MetadataValues.SecurityGroups, "\n"))
 }
 
+func (s *MetadataService) GetPlacement(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "availability-zone")
+}
+
 func (s *MetadataService) GetSecurityCredentialDetails(w http.ResponseWriter, r *http.Request) {
 	username := web.Vars(r)["username"]
 
@@ -212,6 +216,9 @@ func (service *MetadataService) Endpoints() map[string]map[string]http.HandlerFu
 		}
 		handlers[metadataPrefix+"/ami-manifest-path"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetAmiManifestPath),
+		}
+		handlers[metadataPrefix+"/placement/"] = map[string]http.HandlerFunc{
+			"GET": plainText(service.GetPlacement),
 		}
 		handlers[metadataPrefix+"/placement/availability-zone"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetAvailabilityZone),

@@ -147,7 +147,9 @@ func (s *MetadataService) GetSecurityCredentialDetails(w http.ResponseWriter, r 
 	}
 
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")
-	err := json.NewEncoder(w).Encode(s.config.MetadataValues.SecurityCredentials)
+	encoder := json.NewEncoder(w)
+	encoder.SetIndent("", "  ")
+	err := encoder.Encode(s.config.MetadataValues.SecurityCredentials)
 	if err != nil {
 		server.Log.Error("error converting security credentails to json: ", err)
 		http.Error(w, "", http.StatusNotFound)

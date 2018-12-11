@@ -14,15 +14,17 @@
         "instance-action": "mock-instance-action",
         "instance-id": "mock-instance-id",
         "instance-type": "mock-instance-type",
-        "mac": "00:00:00:00:00:00",
+        "mac": "00:00:00:00:00:01",
         "profile": "mock-profile",
         "reservation-id":"mock-reservation-id",
+        "RoleName": "role1",
         "security-credentials": {
-            "user": "mock-user",
+            "Type": "type",
             "AccessKeyId" : "mock-access-key",
             "SecretAccessKey" : "mock-secret-key",
             "Token": "mock-token",
             "Expiration": "2112-12-31T11:59:59Z",
+            "LastUpdated": "2012-12-31T11:59:59Z",
             "Code": "Success"
         },
         "security-groups": [

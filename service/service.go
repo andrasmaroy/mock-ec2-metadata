@@ -12,11 +12,12 @@ import (
 
 type (
 	SecurityCredentials struct {
-		User            string `json:"User"`
+		Type            string `json:"Type"`
 		AccessKeyId     string `json:"AccessKeyId"`
 		SecretAccessKey string `json:"SecretAccessKey"`
 		Token           string `json:"Token"`
 		Expiration      string `json:"Expiration"`
+		LastUpdated     string `json:"LastUpdated"`
 		Code            string `json:"Code"`
 	}
 
@@ -36,6 +37,7 @@ type (
 		ReservationId       string              `json:"reservation-id"`
 		SecurityGroups      []string            `json:"security-groups"`
 		SecurityCredentials SecurityCredentials `json:"security-credentials"`
+		RoleName 			string 				`json:"RoleName"`
 	}
 
 	Config struct {
@@ -130,7 +132,7 @@ func (s *MetadataService) GetReservationId(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *MetadataService) GetSecurityCredentials(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, s.config.MetadataValues.SecurityCredentials.User)
+	fmt.Fprintf(w, s.config.MetadataValues.RoleName)
 }
 
 func (s *MetadataService) GetSecurityGroups(w http.ResponseWriter, r *http.Request) {
@@ -144,8 +146,8 @@ func (s *MetadataService) GetPlacement(w http.ResponseWriter, r *http.Request) {
 func (s *MetadataService) GetSecurityCredentialDetails(w http.ResponseWriter, r *http.Request) {
 	username := web.Vars(r)["username"]
 
-	if username != s.config.MetadataValues.SecurityCredentials.User {
-		server.Log.Error("error, IAM user not found")
+	if username != s.config.MetadataValues.RoleName {
+		server.Log.Error("error, IAM user not found, config user: ", s.config.MetadataValues.RoleName, ", endpoint user: ", username)
 		http.Error(w, "", http.StatusNotFound)
 		return
 	}

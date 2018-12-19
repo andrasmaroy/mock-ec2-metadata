@@ -37,14 +37,14 @@ type (
 		ReservationId       string              `json:"reservation-id"`
 		SecurityGroups      []string            `json:"security-groups"`
 		SecurityCredentials SecurityCredentials `json:"security-credentials"`
-		RoleName 			string 				`json:"RoleName"`
+		RoleName            string              `json:"RoleName"`
+		UserData            string              `json:"user-data"`
 	}
 
 	Config struct {
 		Server           *server.Config
 		MetadataValues   *MetadataValues
 		MetadataPrefixes []string
-		UserdataValues   map[string]string
 		UserdataPrefixes []string
 	}
 
@@ -180,15 +180,12 @@ func (s *MetadataService) GetMetadataIndex(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *MetadataService) GetUserData(w http.ResponseWriter, r *http.Request) {
-
-	for index, value := range s.config.UserdataValues {
-		fmt.Fprintf(w, fmt.Sprint(index+"="+value+"\n"))
-	}
+	fmt.Fprintf(w, s.config.MetadataValues.UserData)
 }
 
 func (s *MetadataService) GetIndex(w http.ResponseWriter, r *http.Request) {
 	var metadataVersions []string
-	for _, metadataPrefix := range s.config.MetadataPrefixes{
+	for _, metadataPrefix := range s.config.MetadataPrefixes {
 		metadataVersions = append(metadataVersions, strings.Split(metadataPrefix, "/")[1])
 	}
 
@@ -204,7 +201,7 @@ func (service *MetadataService) Endpoints() map[string]map[string]http.HandlerFu
 
 		var metadataVersion = strings.Split(metadataPrefix, "/")[1]
 		server.Log.Info("adding metadata version: ", metadataVersion)
-		handlers["/" + metadataVersion + "/"] = map[string]http.HandlerFunc{
+		handlers["/"+metadataVersion+"/"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetMetadata),
 		}
 		handlers[metadataPrefix+"/"] = map[string]http.HandlerFunc{
@@ -272,7 +269,7 @@ func (service *MetadataService) Endpoints() map[string]map[string]http.HandlerFu
 	for index, value := range service.config.UserdataPrefixes {
 		server.Log.Info("adding Userdata prefix (", index, ") ", value)
 
-		handlers[value+"/"] = map[string]http.HandlerFunc{
+		handlers[value] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetUserData),
 		}
 	}

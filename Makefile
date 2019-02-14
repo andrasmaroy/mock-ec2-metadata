@@ -23,13 +23,9 @@ help:
 	@echo
 
 deps:
-	go get google.golang.org/appengine
-	go get github.com/influxdata/influxdb1-client/v2
 	go get github.com/mtibben/gogpm
 	go get github.com/tcnksm/ghr
 	go get github.com/mitchellh/gox
-	go get github.com/Sirupsen/logrus
-	go get github.com/hashicorp/consul
 	$(GOPATH)/bin/gogpm install
 
 build:

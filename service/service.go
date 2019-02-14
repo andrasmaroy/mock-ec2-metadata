@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/NYTimes/gizmo/server"
-	"github.com/NYTimes/gizmo/web"
 )
 
 type (
@@ -144,7 +143,7 @@ func (s *MetadataService) GetPlacement(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *MetadataService) GetSecurityCredentialDetails(w http.ResponseWriter, r *http.Request) {
-	username := web.Vars(r)["username"]
+	username := server.Vars(r)["username"]
 
 	if username != s.config.MetadataValues.RoleName {
 		server.Log.Error("error, IAM user not found, config user: ", s.config.MetadataValues.RoleName, ", endpoint user: ", username)

@@ -166,7 +166,9 @@ func (s *MetadataService) GetSecurityCredentialDetails(w http.ResponseWriter, r 
 }
 
 func (s *MetadataService) GetMetadata(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `meta-data`)
+    var metadataItems = []string{"dynamic", "meta-data", "user-data"}
+
+    fmt.Fprintf(w, strings.Join(metadataItems, "\n"))
 }
 
 func (s *MetadataService) GetMetadataIndex(w http.ResponseWriter, r *http.Request) {

@@ -33,6 +33,7 @@ type (
 		LocalIpv4           string              `json:"local-ipv4"`
 		Mac                 string              `json:"mac"`
 		Profile             string              `json:"profile"`
+		PublicIpv4          string              `json:"public-ipv4"`
 		ReservationId       string              `json:"reservation-id"`
 		SecurityGroups      []string            `json:"security-groups"`
 		SecurityCredentials SecurityCredentials `json:"security-credentials"`
@@ -124,6 +125,10 @@ func (s *MetadataService) GetMac(w http.ResponseWriter, r *http.Request) {
 
 func (s *MetadataService) GetProfile(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, s.config.MetadataValues.Profile)
+}
+
+func (s *MetadataService) GetPublicIpv4(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, s.config.MetadataValues.PublicIpv4)
 }
 
 func (s *MetadataService) GetReservationId(w http.ResponseWriter, r *http.Request) {
@@ -258,6 +263,9 @@ func (service *MetadataService) Endpoints() map[string]map[string]http.HandlerFu
 		}
 		handlers[metadataPrefix+"/profile"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetProfile),
+		}
+		handlers[metadataPrefix+"/public-ipv4"] = map[string]http.HandlerFunc{
+			"GET": plainText(service.GetPublicIpv4),
 		}
 		handlers[metadataPrefix+"/reservation-id"] = map[string]http.HandlerFunc{
 			"GET": plainText(service.GetReservationId),

@@ -1,4 +1,4 @@
-package service
+package metadata
 
 import (
 	"encoding/json"
@@ -35,9 +35,9 @@ type (
 		Profile             string              `json:"profile"`
 		PublicIpv4          string              `json:"public-ipv4"`
 		ReservationId       string              `json:"reservation-id"`
+		User                string              `json:"User"`
 		SecurityGroups      []string            `json:"security-groups"`
 		SecurityCredentials SecurityCredentials `json:"security-credentials"`
-		RoleName            string              `json:"RoleName"`
 		UserData            string              `json:"user-data"`
 	}
 
@@ -136,7 +136,7 @@ func (s *MetadataService) GetReservationId(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *MetadataService) GetSecurityCredentials(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, s.config.MetadataValues.RoleName)
+	fmt.Fprintf(w, s.config.MetadataValues.User)
 }
 
 func (s *MetadataService) GetSecurityGroups(w http.ResponseWriter, r *http.Request) {
@@ -150,8 +150,8 @@ func (s *MetadataService) GetPlacement(w http.ResponseWriter, r *http.Request) {
 func (s *MetadataService) GetSecurityCredentialDetails(w http.ResponseWriter, r *http.Request) {
 	username := server.Vars(r)["username"]
 
-	if username != s.config.MetadataValues.RoleName {
-		server.Log.Error("error, IAM user not found, config user: ", s.config.MetadataValues.RoleName, ", endpoint user: ", username)
+	if username != s.config.MetadataValues.User {
+		server.Log.Error("error, IAM user not found, config user: ", s.config.MetadataValues.User, ", endpoint user: ", username)
 		http.Error(w, "", http.StatusNotFound)
 		return
 	}
